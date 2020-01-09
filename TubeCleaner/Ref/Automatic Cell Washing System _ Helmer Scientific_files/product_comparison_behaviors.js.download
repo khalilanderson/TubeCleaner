@@ -1,0 +1,81 @@
+(function($){
+  Drupal.behaviors.helmerProductComparison = {
+    attach: function(context, settings){
+
+      //$(".views-infinite-scroll-content-wrapper").once("product-comparison-init").each(function(){
+      $(context).find(".views-infinite-scroll-content-wrapper").each(function(){
+
+        // first, determine whether this is a restricted product and hide accordingly.
+        // get the headers of a simple call to extract x-geo-country
+        ProductComparison.GetHeaders(function(headerMap){
+          var geoCountry = null;
+
+          if ( headerMap['x-geo-country'] ){
+            geoCountry = headerMap['x-geo-country'].toLowerCase();
+          }
+          if ( geoCountry == null || typeof(geoCountry) == 'undefined'){
+            geoCountry = "us";
+          }
+
+          var searchResults = $(".product-detail-grid");
+          searchResults.each(function(){
+            var thisEl = $(this);
+
+            var restrictionJson = thisEl.find('.js-restricted-countries').attr('data-restricted-countries-json');
+
+            var restrictions =  JSON.parse(restrictionJson);
+
+            
+            // var restricted = restrictions.find(function(restriction){
+            //   return restriction.toLowerCase() == geoCountry;
+            // });
+
+            var restricted = undefined;
+
+            for(let i = 0; i < restrictions.length; i++){
+              if(restrictions[i].toLowerCase() == geoCountry){
+                restricted = restrictions[i];
+                i = restrictions.length;
+              }
+            }
+
+            if ( !restricted ){
+              thisEl.show();
+            }
+
+          });
+        });
+
+        // second, start product comparison.
+        var thisElement = $(this);
+
+        var productComparison = new ProductComparison();
+
+        productComparison.Initialize(thisElement);
+
+
+      });
+
+      $(".js-search-form").once("product-comparison-link-init").each(function(){
+        var thisElement = $(this);
+
+        var productComparison = new ProductComparison();
+
+        productComparison.Initialize(thisElement);
+
+      });
+
+      $(".product-comparison-view").once("product-comparison-view-page").each(function(){
+        var thisElement = $(this);
+
+        var productComparison = new ProductComparison();
+
+        productComparison.InitializeComparisonPage(thisElement);
+
+
+      });
+
+
+    }
+  }
+}(jQuery));

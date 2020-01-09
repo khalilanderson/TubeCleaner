@@ -1,0 +1,16 @@
+(function($){
+  Drupal.behaviors.helmerProductTypeBehaviors = {
+    attach: function(context, settings){
+
+      $(".helmer-product-types .product_types_hero").once("product-types-hero-once").each(function(){
+
+        var productTypeHero = new ProductTypeHero();
+
+        productTypeHero.Initialize();
+
+
+      });
+
+    }
+  }
+}(jQuery));
